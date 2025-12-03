@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض المنتجات التقنية - 2025</title>
+    <!-- استيراد خطوط عربية مميزة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --text-light: #ffffff;
+            --text-dim: #cccccc;
+            /* ألوان العلامات التجارية */
+            --accent-infinix: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --accent-doogee: linear-gradient(135deg, #3d3393 0%, #2b76b9 37%, #2cacd1 65%, #35eb93 100%);
+            --accent-doogee-vip: linear-gradient(135deg, #bf953f 0%, #fcf6ba 45%, #b38728 50%, #fbf5b7 100%);
+            --accent-gtab: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%);
+            --accent-zte: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            /* تم تحديث ألوان الإكسسوارات لتبتعد عن الأسود */
+            --accent-watch: linear-gradient(135deg, #43E98B 0%, #30A75C 100%); /* لون جديد للساعات (أخضر زمردي) */
+            --accent-audio: linear-gradient(135deg, #FF7B59 0%, #FF3366 100%); /* لون جديد للسماعات (أحمر مرجاني) */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* حاوية السلايدر */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+            transform: scale(0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+            z-index: 2;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* بطاقة المنتج */
+        .product-card {
+            display: flex;
+            flex-direction: row;
+            width: 90%;
+            max-width: 1400px;
+            height: 90vh; /* زيادة الارتفاع قليلاً */
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* القسم البصري (الصورة) */
+        .visual-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2); /* خلفية داكنة خفيفة لتمييز الصورة */
+        }
+
+        .visual-circle {
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(60px);
+            position: absolute;
+            z-index: 0;
+            opacity: 0.6;
+        }
+
+        /* حاوية الصورة */
+        .image-container {
+            z-index: 1;
+            width: 80%;
+            height: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* في حالة عدم وجود صورة نستخدم الأيقونة */
+        .product-icon-fallback {
+            font-size: 12rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .brand-tag {
+            z-index: 2;
+            margin-top: 20px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            color: white;
+        }
+
+        /* قسم المعلومات */
+        .info-section {
+            flex: 1.2;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            width: fit-content;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .product-title {
+            font-family: 'Cairo', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 25px; 
+            line-height: 1.1;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* شبكة المواصفات */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .spec-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 15px;
+            border-radius: 12px;
+            border-right: 4px solid;
+            transition: transform 0.3s;
+        }
+
+        .spec-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .spec-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-light);
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        /* الصندوق المميز (VIP / Features) */
+        .feature-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 5px;
+            position: relative;
+        }
+        
+        .feature-box.vip {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(0, 0, 0, 0.3));
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .feature-header {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+            color: #fff;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .f-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* أزرار التحكم */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.3); }
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+
+        .indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 80%;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot.active { background: white; transform: scale(1.3); }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* أيقونات تعويضية */
+        .icon-tablet::before { content: '📱'; }
+        .icon-phone::before { content: '🤳'; }
+        .icon-watch::before { content: '⌚'; }
+        .icon-buds::before { content: '🎧'; }
+
+        /* ====== التعديلات الخاصة بشاشات الهاتف تبدأ هنا (تكبير الصورة وإزالة التمرير) ====== */
+        @media (max-width: 900px) {
+            .product-card { 
+                flex-direction: column; 
+                height: 90vh; 
+                width: 95%; 
+                overflow-y: hidden; 
+            }
+            /* **تصغير القسم البصري وزيادة حجمه الداخلي** */
+            .visual-section { 
+                flex: 0 0 auto; 
+                min-height: 200px; /* زيادة الارتفاع قليلاً لتكبير الصورة */
+                height: auto; 
+                padding: 10px 10px 0; 
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                border-radius: 30px 30px 0 0;
+                margin-bottom: 0px; 
+            }
+            .info-section { 
+                flex: 1; 
+                padding: 10px 20px 10px 20px; 
+                padding-top: 5px; 
+                margin-top: 0;
+                justify-content: flex-start;
+                border-radius: 0 0 30px 30px;
+            }
+
+            /* تعديل العناصر داخل القسم البصري (العنوان والفئة) */
+            .category-badge {
+                margin-bottom: 0px;
+                font-size: 0.8rem;
+                padding: 5px 10px;
+                order: 1;
+            }
+            .product-title { 
+                font-size: 1.5rem; 
+                font-weight: 700;
+                margin-top: 5px;
+                margin-bottom: 5px; 
+                order: 2;
+            }
+
+            .image-container { 
+                height: 110px; /* زيادة ارتفاع حاوية الصورة لتكبيرها */
+                width: 70%;
+                order: 3;
+                margin-bottom: 5px;
+            }
+            .product-icon-fallback { 
+                font-size: 5rem; /* زيادة حجم الأيقونة لتكبيرها */
+            }
+            .brand-tag {
+                order: 4;
+                font-size: 1.2rem; 
+                margin-top: 5px;
+            }
+
+            /* تغيير طريقة عرض المواصفات (لضغطها) */
+            .specs-grid { 
+                grid-template-columns: 1fr; 
+                gap: 0; 
+                margin-top: 0; 
+                margin-bottom: 0px; 
+            }
+            .specs-grid .spec-item {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                background: none;
+                padding: 5px 0; 
+                border-radius: 0;
+            }
+            .specs-grid .spec-item:last-child {
+                border-bottom: none;
+            }
+            .specs-grid .spec-label {
+                font-size: 0.75rem; 
+                margin-bottom: 2px;
+            }
+            .specs-grid .spec-value {
+                font-size: 1rem; 
+            }
+            .nav-btn {
+                width: 30px; 
+                height: 30px;
+                font-size: 0.8rem;
+            }
+            .indicators {
+                bottom: 10px; 
+            }
+        }
+        /* ====== التعديلات الخاصة بشاشات الهاتف تنتهي هنا ====== */
+    </style>
+</head>
+<body>
+
+    <div class="slider-container" id="slider">
+        <!-- Slides generated by JS -->
+    </div>
+
+    <button class="nav-btn next-btn" onclick="changeSlide(1)">&#10094;</button>
+    <button class="nav-btn prev-btn" onclick="changeSlide(-1)">&#10095;</button>
+
+    <div class="indicators" id="indicators"></div>
+
+    <script>
+        /*
+         * تعليمات وضع الصور:
+         * 1. ابحث عن خاصية "image" داخل كل منتج في الأسفل.
+         * 2. ضع رابط الصورة داخل علامات التنصيص. مثال: image: "images/xpad.png"
+         * 3. إذا لم تضع صورة، سيستخدم الكود الأيقونة (الإيموجي) تلقائياً.
+         * 4. يفضل أن تكون الصور بصيغة PNG وبخلفية شفافة لتعطي أفضل شكل.
+         *
+         *  !! تم تحديث جميع حقول 'image' بمسارات الصور المطلوبة !!
+         */
+
+        const products = [
+            // --- TABLETS ---
+            {
+                name: "Infinix Xpad 20 Pro",
+                category: "Tablet | تابلت",
+                brand: "Infinix",
+                theme: "var(--accent-infinix)",
+                icon: "icon-tablet",
+                image: "images/infinix_xpad_20_pro.png", 
+                specs: [
+                    { label: "المعالج", value: "MediaTek Helio G100" },
+                    { label: "التخزين والرام", value: "256GB | 8+8GB RAM" }, // تم التعديل
+                    { label: "حجم الشاشه", value: "12.0 بوصة 2K (1200x2000)" },
+                    { label: "نظام التشغيل", value: "Android 15" },
+                    { label: "مرفقات الكرتونه", value: "شاحن، كابل، دليل مستخدم، كيبورد" }, // تم التعديل
+                    { label: "البطاريه", value: "8000 mAh" }
+                ],
+                extra: ["كاميرا 8MP/5MP", "جسم معدني نحيف"]
+            },
+            {
+                name: "Infinix Xpad 20",
+                category: "Tablet | تابلت",
+                brand: "Infinix",
+                theme: "var(--accent-infinix)",
+                icon: "icon-tablet",
+                image: "images/infinix_xpad_20.png",
+                specs: [
+                    { label: "المعالج", value: "MediaTek Helio G88" },
+                    { label: "التخزين والرام", value: "128GB | 6+6GB RAM" }, // تم التعديل
+                    { label: "حجم الشاشه", value: "11.0 بوصة FHD+ (90Hz)" },
+                    { label: "نظام التشغيل", value: "Android 15" },
+                    { label: "مرفقات الكرتونه", value: "جراب هدية، شاحن 10W، كابل USB-C" }, // تم التعديل
+                    { label: "البطاريه", value: "7000 mAh" }
+                ],
+                extra: ["مساعد Folax الصوتي", "2 سماعات ستيريو"] // تم التعديل
+            },
+            {
+                name: "DooGee A9 Pro VIP",
+                category: "Tablet | تابلت",
+                brand: "DooGee",
+                theme: "var(--accent-doogee-vip)",
+                icon: "icon-tablet",
+                image: "images/doogee_a9_pro_vip.png",
+                specs: [
+                    { label: "المعالج", value: "Unisoc T310 Quad-Core" },
+                    { label: "التخزين والرام", value: "128GB | 20GB (4+16 Virtual)" }, // تم التعديل
+                    { label: "حجم الشاشه", value: "10.1 بوصة IPS HD+" },
+                    { label: "نظام التشغيل", value: "Android 15" }, // تم التعديل
+                    { label: "مرفقات الكرتونه", value: "VIP Box Full Set" }, 
+                    { label: "البطاريه", value: "6580 mAh" }
+                ],
+                vip: ["لوحة مفاتيح بلوتوث", "ماوس لاسلكي", "قلم لمس", "جراب حماية فاخر"]
+            },
+            {
+                name: "DooGee A9 VIP",
+                category: "Tablet | تابلت",
+                brand: "DooGee",
+                theme: "var(--accent-doogee-vip)",
+                icon: "icon-tablet",
+                image: "images/doogee_a9_vip.png",
+                specs: [
+                    { label: "المعالج", value: "Unisoc T310" },
+                    { label: "التخزين والرام", value: "64GB | 3+9GB RAM" }, // تم التعديل
+                    { label: "حجم الشاشه", value: "10.1 بوصة IPS HD+" },
+                    { label: "نظام التشغيل", value: "Android 15" }, // تم التعديل
+                    { label: "مرفقات الكرتونه", value: "صندوق الهدايا الكامل" },
+                    { label: "البطاريه", value: "6580 mAh" }
+                ],
+                vip: ["كيبورد وماوس", "قلم", "جراب جلد", "واقي شاشة"]
+            },
+            {
+                name: "DooGee TAB A9",
+                category: "Tablet | تابلت",
+                brand: "DooGee",
+                theme: "var(--accent-doogee)",
+                icon: "icon-tablet",
+                image: "images/doogee_tab_a9.png",
+                specs: [
+                    { label: "المعالج", value: "Unisoc T310" },
+                    { label: "التخزين والرام", value: "64GB | 3+9GB RAM" }, // تم التعديل
+                    { label: "حجم الشاشه", value: "10.1 بوصة IPS" },
+                    { label: "نظام التشغيل", value: "Android 15" }, // تم التعديل
+                    { label: "مرفقات الكرتونه", value: "شاحن، كابل" },
+                    { label: "البطاريه", value: "6580 mAh" }
+                ],
+                extra: ["مناسب للدراسة", "سعر اقتصادي"]
+            },
+            {
+                name: "G-TAB Pad 10",
+                category: "Tablet | تابلت",
+                brand: "G-TAB",
+                theme: "var(--accent-gtab)",
+                icon: "icon-tablet",
+                image: "images/gtab_pad_10.png",
+                specs: [
+                    { label: "المعالج", value: "Unisoc T606 (8 Cores)" },
+                    { label: "التخزين والرام", value: "128GB | 4GB (+6GB Virtual)" },
+                    { label: "الاتصال", value: "Wi-Fi Only" }, // تم التعديل
+                    { label: "نظام التشغيل", value: "Android 14" },
+                    { label: "مرفقات الكرتونه", value: "جراب سيلكون شفاف، شاحن، كابل، دبوس شريحة" }, // تم التعديل
+                    { label: "البطاريه", value: "6580 mAh" }
+                ],
+                extra: ["كاميرا خلفية 13MP", "أداء سلس"]
+            },
+            {
+                name: "G-TAB Kids T8S",
+                category: "Kids Tablet | تابلت أطفال",
+                brand: "G-TAB",
+                theme: "linear-gradient(135deg, #FF9966 0%, #FF5E62 100%)",
+                icon: "icon-tablet",
+                image: "images/gtab_kids_t8s.png",
+                specs: [
+                    { label: "المعالج", value: "Quad-Core Processor" },
+                    { label: "التخزين والرام", value: "64GB | 4GB RAM" },
+                    { label: "حجم الشاشه", value: "8.0 بوصة HD" },
+                    { label: "نظام التشغيل", value: "Android (Kids Mode)" },
+                    { label: "مرفقات الكرتونه", value: "جراب مطاطي متين لحمايه التابلت من الكسر" }, // تم التعديل
+                    { label: "البطاريه", value: "5000 mAh" }
+                ],
+                extra: ["تطبيقات تعليمية", "ألوان مبهجة"]
+            },
+            {
+                name: "G-TAB T9 Series",
+                category: "Tablet | تابلت",
+                brand: "G-TAB",
+                theme: "var(--accent-gtab)",
+                icon: "icon-tablet",
+                image: "images/gtab_t9_series.png",
+                specs: [
+                    { label: "المعالج", value: "Rockchip RK3562" },
+                    { label: "التخزين والرام", value: "64GB | 3GB RAM" },
+                    { label: "الاتصال", value: "Wi‑Fi Only" }, // تم التعديل
+                    { label: "نظام التشغيل", value: "Android 14" },
+                    { label: "مرفقات الكرتونه", value: "شاحن، كابل، اسكرينة شاشة" }, // تم التعديل
+                    { label: "البطاريه", value: "5500 mAh" } // تم التعديل
+                ],
+                extra: ["خيار اقتصادي ممتاز", "شاشة واضحة"]
+            },
+            // --- PHONES ---
+            {
+                name: "ZTE Blade V60 Design",
+                category: "Smartphone | هاتف ذكي",
+                brand: "ZTE",
+                theme: "var(--accent-zte)",
+                icon: "icon-phone",
+                image: "images/zte_blade_v60_design.png",
+                specs: [
+                    { label: "المعالج", value: "Unisoc T606" },
+                    { label: "التخزين والرام", value: "256GB | Up to 16GB RAM" },
+                    { label: "حجم الشاشه", value: "6.6 بوصة HD+ 90Hz" },
+                    { label: "نظام التشغيل", value: "Android 13" },
+                    { label: "مرفقات الكرتونه", value: "شاحن 22.5W، كابل، جراب" },
+                    { label: "البطاريه", value: "5000 mAh" }
+                ],
+                extra: ["كاميرا 50MP", "تصميم زجاجي"]
+            },
+            {
+                name: "ZTE Blade A55",
+                category: "Smartphone | هاتف ذكي",
+                brand: "ZTE",
+                theme: "var(--accent-zte)",
+                icon: "icon-phone",
+                image: "images/zte_blade_a55.png",
+                specs: [
+                    { label: "المعالج", value: "Unisoc SC9863A" },
+                    { label: "التخزين والرام", value: "128GB | 4GB RAM" }, // تم التعديل
+                    { label: "حجم الشاشه", value: "6.75 بوصة 90Hz" },
+                    { label: "نظام التشغيل", value: "Android 14" },
+                    { label: "مرفقات الكرتونه", value: "شاحن، كابل" },
+                    { label: "البطاريه", value: "5000 mAh" }
+                ],
+                extra: ["بصمة جانبية", "الكاميرا الخلفية 13MP"] // تم التعديل
+            },
+            // --- WATCHES ---
+            {
+                name: "Infinix SmartWatch XW3E", // تم التبديل
+                category: "Smart Watch | ساعة ذكية",
+                brand: "Infinix",
+                theme: "var(--accent-watch)",
+                icon: "icon-watch",
+                image: "images/XW3E.png", // تم تعديل مسار الصورة
+                specs: [
+                    { label: "الشاشة", value: "1.43 بوصة AMOLED (466×466)" }, 
+                    { label: "الاتصال", value: "Bluetooth 5.2 / 5.3 Calling" }, 
+                    { label: "البطارية", value: "300 mAh (5-7 أيام استخدام)" }, 
+                    { label: "المقاومة", value: "IP68 ضد الماء والغبار" }, 
+                    { label: "المستشعرات", value: "قياس نبضات القلب، SpO2، مراقبة النوم" },
+                    { label: "التصميم", value: "جسم معدني (Zinc Alloy) وزر تاج دوار" }
+                ],
+                extra: ["Always-on Display", "ألوان زاهية وواضحة تحت الشمس"]
+            },
+            {
+                name: "Infinix Watch N4 Pro (XW4E)",
+                category: "Smart Watch | ساعة ذكية",
+                brand: "Infinix",
+                theme: "var(--accent-watch)",
+                icon: "icon-watch",
+                image: "images/infinix_watch_n4_pro.png",
+                specs: [
+                    { label: "الشاشة", value: "1.43 بوصة AMOLED" },
+                    { label: "الدقة", value: "466x466 بكسل عالية" },
+                    { label: "البطارية", value: "تدوم حتى 12 يوم" },
+                    { label: "الاتصال", value: "Bluetooth 5.2" },
+                    { label: "المقاومة", value: "IP68" },
+                    { label: "الميزات", value: "Always On Display" }
+                ],
+                extra: ["شاشة أموليد", "تصميم دائري فاخر"]
+            },
+            {
+                name: "Infinix Watch N4 (XW4)", // تم إضافة المنتج الجديد
+                category: "Smart Watch | ساعة ذكية",
+                brand: "Infinix",
+                theme: "var(--accent-watch)",
+                icon: "icon-watch",
+                image: "images/XW4-N4.png", 
+                specs: [
+                    { label: "الشاشة", value: "1.39 بوصة HD (360×360)" }, 
+                    { label: "البطارية", value: "300 mAh (تدوم حتى 12 يومًا)" }, 
+                    { label: "الاتصال", value: "Bluetooth Calling" }, 
+                    { label: "المقاومة", value: "IP68 ضد الماء والغبار" }, 
+                    { label: "الميزات", value: "تطبيق My Health (+100 وضع رياضي)" },
+                    { label: "الصحة", value: "قياس نبضات القلب و SpO2" }
+                ],
+                extra: ["شاشة دائرية Full Touch HD", "+200 وجه للساعة"]
+            },
+            {
+                name: "Infinix SmartWatch XW3GT (Gold Edition)", // تم التبديل
+                category: "Smart Watch | ساعة ذكية",
+                brand: "Infinix",
+                theme: "var(--accent-doogee-vip)", // لون ذهبي مميز
+                icon: "icon-watch",
+                image: "images/XW3GT.png", // تم تعديل مسار الصورة
+                specs: [
+                    { label: "الشاشة", value: "1.53 بوصة IPS (360×360)" }, 
+                    { label: "البطارية", value: "500 mAh (تدوم حتى 10 أيام استخدام ثقيل)" }, 
+                    { label: "التصميم", value: "ذهبي فاخر (Zinc Alloy) مع زر تاج دوار" },
+                    { label: "الاتصال", value: "Bluetooth 5.2 Calling" }, 
+                    { label: "المقاومة", value: "IP68" }, 
+                    { label: "الرياضة", value: "+123 وضع رياضي" }
+                ],
+                extra: ["شاشة كبيرة 500 شمعة", "حزمة بسوارين (Bundle)"]
+            },
+            {
+                name: "Infinix Watch H4 (XW4L)",
+                category: "Smart Watch | ساعة ذكية",
+                brand: "Infinix",
+                theme: "var(--accent-watch)",
+                icon: "icon-watch",
+                image: "images/infinix_watch_h4.png",
+                specs: [
+                    { label: "الشاشة", value: "2.04 بوصة HD ضخمة" },
+                    { label: "البطارية", value: "300mAh (7 أيام)" },
+                    { label: "الاتصال", value: "BT Calling 5.3" },
+                    { label: "المقاومة", value: "IP68" },
+                    { label: "الصحة", value: "مراقبة النوم، النبض" },
+                    { label: "التوافق", value: "Android & iOS" }
+                ],
+                extra: ["أكبر شاشة في الفئة", "شحن مغناطيسي"]
+            },
+            // --- AUDIO ---
+            {
+                name: "Infinix TWS XEOE01", // تم تعديل الاسم
+                category: "Audio | سماعات (مفتوحة)",
+                brand: "Infinix",
+                theme: "var(--accent-audio)",
+                icon: "icon-buds",
+                image: "images/infinix_xbuds_3_loop.png",
+                specs: [
+                    { label: "النوع", value: "Open-Ear (تصميم حلقة Loop)" },
+                    { label: "التقنية", value: "Air Conduction (توصيل الهواء)" },
+                    { label: "البطارية", value: "حتى 36 ساعة (مع العلبة 400mAh)" },
+                    { label: "الميكروفون", value: "4-Mic ENC (لعزل المكالمات)" },
+                    { label: "المقاومة", value: "IPX4 (تعرق ورذاذ الماء)" },
+                    { label: "البلوتوث", value: "V5.3" }
+                ],
+                extra: ["جودة صوت واضحة وآمنة في الشارع", "تصميم رياضي وعصري"]
+            },
+            {
+                name: "Infinix XE28 (Buds NC)", // تم التبديل
+                category: "Audio | سماعات (عزل ضوضاء)",
+                brand: "Infinix",
+                theme: "var(--accent-audio)",
+                icon: "icon-buds",
+                image: "images/XE28.png",
+                specs: [
+                    { label: "النوع", value: "In-Ear (داخل الأذن)" },
+                    { label: "العزل", value: "Active Noise Cancellation (ANC) حتى 30dB" },
+                    { label: "البطارية", value: "حتى 35 ساعة إجمالي" },
+                    { label: "عزل المكالمات", value: "4-Mic ENC مدعوم بالذكاء الاصطناعي" },
+                    { label: "المحرك", value: "10mm Drivers (Rich Bass)" },
+                    { label: "الشحن", value: "Type-C سريع (10 دقائق = 1 ساعة استماع)" }
+                ],
+                extra: ["لون أخضر مطفي عصري", "دعم تطبيق Welife (Game Mode)"]
+            },
+            {
+                name: "Infinix XE30S Black", // تم إضافة المنتج الجديد
+                category: "Audio | سماعات (للألعاب)",
+                brand: "Infinix",
+                theme: "var(--accent-audio)",
+                icon: "icon-buds",
+                image: "images/Infinix_XE30S.png",
+                specs: [
+                    { label: "التصميم", value: "GT Buds 3 (تصميم Mecha)" },
+                    { label: "وضع الألعاب", value: "Low Latency (45ms)" },
+                    { label: "البطارية", value: "حتى 28 ساعة إجمالي (6 ساعات للسماعة)" },
+                    { label: "المحرك", value: "13mm Drivers (Bass قوي)" },
+                    { label: "الميزات", value: "إضاءة LED تفاعلية (RGB)" },
+                    { label: "عزل المكالمات", value: "AI ENC (4 ميكروفونات)" }
+                ],
+                extra: ["أداء ممتاز للألعاب", "دعم تطبيق Welife"]
+            },
+            {
+                name: "Infinix TWS XE37", // تم تعديل الاسم
+                category: "Audio | سماعات (شاشة وتحكم)",
+                brand: "Infinix",
+                theme: "var(--accent-audio)",
+                icon: "icon-buds",
+                image: "images/xe37base.png",
+                specs: [
+                    { label: "العلبة", value: "Touchscreen Case (شاشة لمس ملونة للتحكم)" },
+                    { label: "الترجمة", value: "AI Translation (ترجمة فورية لـ 162 لغة)" },
+                    { label: "العزل", value: "Hybrid ANC (عزل ضوضاء قوي 45dB)" },
+                    { label: "البطارية", value: "حتى 36 ساعة إجمالي" },
+                    { label: "الاتصال", value: "Bluetooth 5.4 الأحدث" },
+                    { label: "المحرك", value: "10mm Drivers" }
+                ],
+                extra: ["التحكم باللمس من العلبة", "تطبيق AI Translation"]
+            },
+            {
+                name: "OPPO Enco Buds2", // تم إضافة المنتج الجديد
+                category: "Audio | سماعات",
+                brand: "OPPO",
+                theme: "linear-gradient(135deg, #FF6F61 0%, #FFB6C1 100%)", // لون جديد لـ OPPO
+                icon: "icon-buds",
+                image: "images/OPPOEncoBuds2.png",
+                specs: [
+                    { label: "اللون", value: "Moonlight (أبيض) مع ساق قصيرة" },
+                    { label: "المحرك", value: "10mm Titanized Drivers (Bass قوي)" },
+                    { label: "البطارية", value: "حتى 28 ساعة إجمالي (7 ساعات للسماعة)" },
+                    { label: "عزل المكالمات", value: "AI Deep Noise Cancellation" },
+                    { label: "الميزات", value: "Double-tap Camera Control" },
+                    { label: "وضع الألعاب", value: "Low Latency (80ms)" }
+                ],
+                extra: ["صوت جهوري عميق (Rich Bass)", "دعم تطبيق HeyMelody"]
+            }
+        ];
+
+        const sliderContainer = document.getElementById('slider');
+        const indicatorsContainer = document.getElementById('indicators');
+
+        function createSlides() {
+            products.forEach((product, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === 0 ? 'active' : ''}`;
+                
+                // التعامل مع المرفقات الخاصة VIP
+                let vipContent = '';
+                if (product.vip) {
+                    vipContent = `
+                        <div class="feature-box vip">
+                            <span class="feature-header" style="color:#FFD700">⭐ مرفقات VIP حصرية:</span>
+                            <div class="feature-tags">
+                                ${product.vip.map(item => `<span class="f-tag">${item}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // التعامل مع المميزات الإضافية Extra
+                let extraContent = '';
+                if (product.extra) {
+                    extraContent = `
+                        <div class="feature-box">
+                            <span class="feature-header">✨ مميزات إضافية:</span>
+                            <div class="feature-tags">
+                                ${product.extra.map(item => `<span class="f-tag">${item}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // تحديد محتوى الصورة (صورة حقيقية أو أيقونة)
+                let visualContent;
+                if (product.image && product.image.trim() !== "") {
+                    visualContent = `<img src="${product.image}" alt="${product.name}" class="product-img">`;
+                } else {
+                    visualContent = `<div class="product-icon-fallback ${product.icon}" style="background: ${product.theme}; -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></div>`;
+                }
+
+                slide.innerHTML = `
+                    <div class="bg-overlay" style="background-image: ${product.theme};"></div>
+                    <div class="product-card">
+                        <div class="visual-section">
+                            <div class="visual-circle" style="background: ${product.theme};"></div>
+                            <!-- **تم نقل العنوان والفئة هنا** -->
+                            <span class="category-badge">${product.category}</span>
+                            <h1 class="product-title" style="background: ${product.theme}; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${product.name}</h1>
+                            <div class="image-container">
+                                ${visualContent}
+                            </div>
+                            <div class="brand-tag">${product.brand}</div>
+                        </div>
+                        <div class="info-section">
+                            
+                            <div class="specs-grid">
+                                ${product.specs.map(spec => `
+                                    <div class="spec-item" style="border-right-color: #fff;">
+                                        <span class="spec-label">${spec.label}</span>
+                                        <span class="spec-value">${spec.value}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            ${vipContent}
+                            ${extraContent}
+                        </div>
+                    </div>
+                `;
+                sliderContainer.appendChild(slide);
+
+                const dot = document.createElement('div');
+                dot.className = `dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => showSlide(index);
+                indicatorsContainer.appendChild(dot);
+            });
+        }
+
+        createSlides();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+
+        function showSlide(index) {
+            if (index >= slides.length) currentSlide = 0;
+            else if (index < 0) currentSlide = slides.length - 1;
+            else currentSlide = index;
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1); 
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+    </script>
+</body>
+</html>
